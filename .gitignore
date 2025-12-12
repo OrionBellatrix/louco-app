@@ -1,1 +1,9 @@
 .env
+
+# Binary files
+main
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
