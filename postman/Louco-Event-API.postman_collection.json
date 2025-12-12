@@ -1,0 +1,1848 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Louco Event API",
+		"description": "Complete API collection for Louco Event backend application built with Clean Architecture principles.\n\n## Base URL\n- Development: http://localhost:8080\n\n## Authentication\nMost endpoints require JWT token in Authorization header:\n```\nAuthorization: Bearer <your_jwt_token>\n```\n\n## Language Support\nAPI supports Turkish and English. Set Accept-Language header:\n- `tr` for Turkish\n- `en` for English (default)\n\n## Response Format\nAll responses follow this standard format:\n```json\n{\n  \"success\": true,\n  \"message\": \"i18n.key\",\n  \"data\": {},\n  \"errors\": null\n}\n```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check API health status and database connectivity."
+					}
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Step 1 - Account Creation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"user@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"user_type\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register/step1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register",
+								"step1"
+							]
+						},
+						"description": "First step of user registration. Creates account with email or phone and password. **Automatically sends verification code!**\n\n**Required Fields:**\n- `identifier`: Valid email address or phone number with country code (e.g., user@example.com or +905551234567)\n- `password`: Minimum 8 characters\n- `user_type`: Either 'user' or 'creator'\n\n**Automatic Verification:**\n- System automatically detects if identifier is email or phone\n- Sends 6-digit verification code via HTML email or SMS\n- Code expires in 10 minutes\n- No separate /send endpoint needed!\n\n**Response:**\n- Returns user_id and JWT token for next steps\n- Includes verification info (sent status, message, expiration)\n- Use the JWT token for /verification/verify endpoint\n\n**Examples:**\n- Email: `{\"identifier\": \"user@example.com\", \"password\": \"SecurePass123!\", \"user_type\": \"user\"}`\n- Phone: `{\"identifier\": \"+905551234567\", \"password\": \"SecurePass123!\", \"user_type\": \"user\"}`\n\n**Next Steps:**\n1. Check your email/SMS for 6-digit code\n2. Use /verification/verify to verify the code\n3. Continue with profile completion"
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"user@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						},
+						"description": "User login with email, phone, or username.\n\n**Fields:**\n- `identifier`: Email, phone number, or username\n- `password`: User password\n\n**Response:**\n- Returns user information and JWT token\n- Token should be used in Authorization header for protected endpoints"
+					}
+				},
+				{
+					"name": "Social Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"provider\": \"google\",\n  \"social_id\": \"google_user_id_123\",\n  \"email\": \"user@gmail.com\",\n  \"full_name\": \"John Doe\",\n  \"user_type\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/social-login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"social-login"
+							]
+						},
+						"description": "Login or register using social media accounts.\n\n**Required Fields:**\n- `provider`: 'apple' or 'google'\n- `social_id`: Unique ID from social provider\n- `user_type`: 'user' or 'creator'\n\n**Optional Fields:**\n- `email`: User's email from social provider\n- `full_name`: User's name from social provider\n\n**Behavior:**\n- If user exists, logs them in\n- If user doesn't exist, creates new account"
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Request password reset token.\n\n**Fields:**\n- `identifier`: Email or phone number\n\n**Behavior:**\n- Sends reset token via email/SMS\n- Token expires after certain time\n- Use token in reset-password endpoint"
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_from_email\",\n  \"new_password\": \"NewSecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reset password using token from forgot-password endpoint.\n\n**Fields:**\n- `token`: Reset token received via email/SMS\n- `new_password`: New password (minimum 8 characters)\n\n**Behavior:**\n- Validates reset token\n- Updates user password\n- Invalidates reset token"
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"current_password\": \"SecurePass123!\",\n  \"new_password\": \"NewSecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"change-password"
+							]
+						},
+						"description": "Change password for authenticated user.\n\n**Authentication:** Required (JWT token)\n\n**Fields:**\n- `current_password`: Current user password\n- `new_password`: New password (minimum 8 characters)\n\n**Behavior:**\n- Validates current password\n- Updates to new password\n- Requires re-authentication"
+					}
+				}
+			]
+		},
+		{
+			"name": "Verification",
+			"item": [
+				{
+					"name": "Verify Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"user@example.com\",\n  \"code\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/verification/verify",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"verification",
+								"verify"
+							]
+						},
+						"description": "Verify email or phone using the 6-digit code automatically detected from identifier.\n\n**Authentication:** Required (JWT token)\n\n**Required Fields:**\n- `identifier`: Email address or phone number that received the verification code\n- `code`: 6-digit verification code from email/SMS\n\n**Behavior:**\n- Automatically detects if identifier is email or phone\n- Validates the verification code\n- Marks email/phone as verified in user profile\n- Sets email_verified_at or phone_verified_at timestamp\n- Removes used verification code\n- Updates user's email/phone if different from current\n\n**Examples:**\n- Email: `{\"identifier\": \"user@example.com\", \"code\": \"123456\"}`\n- Phone: `{\"identifier\": \"+905551234567\", \"code\": \"123456\"}`\n\n**Response:**\n- Returns success message on successful verification\n- Returns error if code is invalid, expired, or already used"
+					}
+				},
+				{
+					"name": "Resend Verification Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/verification/resend",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"verification",
+								"resend"
+							]
+						},
+						"description": "Resend verification code to email or phone if previous code expired or was lost.\n\n**Authentication:** Required (JWT token)\n\n**Required Fields:**\n- `identifier`: Email address or phone number to resend verification code\n\n**Behavior:**\n- Automatically detects if identifier is email or phone\n- Invalidates any existing verification codes for this identifier\n- Generates new 6-digit verification code\n- Sends new HTML email or SMS via Twilio\n- New code expires in 10 minutes\n- Rate limited to prevent spam (max 3 resends per hour)\n\n**Examples:**\n- Email: `{\"identifier\": \"user@example.com\"}`\n- Phone: `{\"identifier\": \"+905551234567\"}`\n\n**Response:**\n- Returns success message with new code expiration time\n- Returns error if rate limit exceeded"
+					}
+				}
+			]
+		},
+		{
+			"name": "Username Management",
+			"item": [
+				{
+					"name": "Check Username Availability",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"johndoe123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/username/check",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"username",
+								"check"
+							]
+						},
+						"description": "Check if username is available.\n\n**Authentication:** Required (JWT token)\n\n**Fields:**\n- `username`: Username to check (3-30 chars, alphanumeric + underscore + dot)\n\n**Response:**\n- Returns whether username exists or not"
+					}
+				},
+				{
+					"name": "Set Username",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"johndoe123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/username/set",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"username",
+								"set"
+							]
+						},
+						"description": "Set username for authenticated user.\n\n**Authentication:** Required (JWT token)\n\n**Fields:**\n- `username`: Username to set (3-30 chars, alphanumeric + underscore + dot)\n\n**Behavior:**\n- Validates username format\n- Checks availability\n- Updates user record"
+					}
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"profile"
+							]
+						},
+						"description": "Get current user's profile information.\n\n**Authentication:** Required (JWT token)\n\n**Response:**\n- Returns complete user profile\n- Includes media count and recent media"
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"John Doe Updated\",\n  \"address\": \"Ankara, Turkey\",\n  \"company_name\": \"New Tech Corp\",\n  \"biography\": \"Senior Software Developer\",\n  \"birth_date\": \"1990-01-01T00:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"profile"
+							]
+						},
+						"description": "Update user profile information.\n\n**Authentication:** Required (JWT token)\n\n**Optional Fields:**\n- `full_name`: User's full name (2-100 chars)\n- `address`: User's address (max 500 chars)\n- `company_name`: Company name (max 200 chars)\n- `biography`: User biography (max 500 chars)\n- `birth_date`: Birth date in ISO format\n\n**Note:** Email and phone are updated via separate endpoint"
+					}
+				},
+				{
+					"name": "Update Contact Information",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newemail@example.com\",\n  \"phone\": \"+905559876543\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/contact",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"contact"
+							]
+						},
+						"description": "Update user contact information (email and phone).\n\n**Authentication:** Required (JWT token)\n\n**Optional Fields:**\n- `email`: Valid email address\n- `phone`: E.164 format phone number\n\n**Behavior:**\n- Validates email/phone format\n- Checks for duplicates\n- Updates user record"
+					}
+				},
+				{
+					"name": "Set Profile Picture",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"media_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/profile-pic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"profile-pic"
+							]
+						},
+						"description": "Set user profile picture using media ID.\n\n**Authentication:** Required (JWT token)\n\n**Required Fields:**\n- `media_id`: ID of uploaded media file to use as profile picture\n\n**Behavior:**\n- Validates media ID exists\n- Updates user profile picture reference\n- Media must belong to the authenticated user"
+					}
+				},
+				{
+					"name": "Set Cover Picture",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"media_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/cover-pic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"cover-pic"
+							]
+						},
+						"description": "Set user cover picture using media ID.\n\n**Authentication:** Required (JWT token)\n\n**Required Fields:**\n- `media_id`: ID of uploaded media file to use as cover picture\n\n**Behavior:**\n- Validates media ID exists\n- Updates user cover picture reference\n- Media must belong to the authenticated user"
+					}
+				},
+				{
+					"name": "Register Step 4 - Complete Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"user@example.com\",\n  \"phone\": \"+905551234567\",\n  \"address\": \"Istanbul, Turkey\",\n  \"company_name\": \"Tech Corp\",\n  \"biography\": \"Software developer passionate about technology\",\n  \"birth_date\": \"1990-01-01T00:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/register/step4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"register",
+								"step4"
+							]
+						},
+						"description": "Complete user registration with profile details.\n\n**Authentication:** Required (JWT token from step 1)\n\n**Required Fields:**\n- `full_name`: User's full name (2-100 chars)\n\n**Optional Fields:**\n- `email`: Valid email address\n- `phone`: E.164 format phone number\n- `address`: User's address (max 500 chars)\n- `company_name`: Company name (max 200 chars)\n- `biography`: User biography (max 500 chars)\n- `birth_date`: Birth date in ISO format"
+					}
+				},
+				{
+					"name": "Deactivate Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"deactivate"
+							]
+						},
+						"description": "Deactivate user account.\n\n**Authentication:** Required (JWT token)\n\n**Behavior:**\n- Sets user account as inactive\n- Preserves user data\n- User can reactivate by logging in again"
+					}
+				}
+			]
+		},
+		{
+			"name": "Media Management",
+			"item": [
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/your/file.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/media/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"media",
+								"upload"
+							]
+						},
+						"description": "Upload image or video file.\n\n**Authentication:** Required (JWT token)\n\n**Form Data:**\n- `file`: File to upload (multipart/form-data)\n\n**Supported Formats:**\n- Images: JPEG, JPG, PNG, WebP, HEIC, HEIF (max 10MB)\n- Videos: MP4, MOV, WebM, AVI, QuickTime (max 100MB)\n\n**Features:**\n- Automatic file type detection\n- Image resizing to 800px width\n- Video format conversion\n- AWS S3 compatible storage\n- Metadata extraction (dimensions, duration)"
+					}
+				},
+				{
+					"name": "Get Media by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/media/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"media",
+								"1"
+							]
+						},
+						"description": "Get media file details by ID.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `id`: Media ID\n\n**Response:**\n- Returns complete media information\n- Includes file URL, metadata, and conversion status"
+					}
+				},
+				{
+					"name": "Get User Media",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/media/user/1?page=1&page_size=10&media_type=image",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"media",
+								"user",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								},
+								{
+									"key": "media_type",
+									"value": "image"
+								}
+							]
+						},
+						"description": "Get media files for specific user.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `user_id`: User ID\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 10, max: 100)\n- `media_type`: Filter by type ('image' or 'video')\n\n**Response:**\n- Returns paginated list of media files\n- Includes pagination metadata"
+					}
+				},
+				{
+					"name": "Update Media",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"original_name\": \"Updated filename.jpg\",\n  \"width\": 1920,\n  \"height\": 1080,\n  \"duration\": 120\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/media/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"media",
+								"1"
+							]
+						},
+						"description": "Update media file metadata.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `id`: Media ID\n\n**Optional Fields:**\n- `original_name`: Updated filename (max 255 chars)\n- `width`: Image/video width in pixels\n- `height`: Image/video height in pixels\n- `duration`: Video duration in seconds\n\n**Note:** Only the media owner can update their files"
+					}
+				},
+				{
+					"name": "Delete Media",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/media/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"media",
+								"1"
+							]
+						},
+						"description": "Delete media file.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `id`: Media ID\n\n**Behavior:**\n- Removes file from storage (AWS S3)\n- Deletes database record\n- Only the media owner can delete their files"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Operations",
+			"item": [
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/users?page=1&page_size=20&user_type=user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								},
+								{
+									"key": "user_type",
+									"value": "user"
+								}
+							]
+						},
+						"description": "Get paginated list of all users (Admin only).\n\n**Authentication:** Required (Admin JWT token)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 10, max: 100)\n- `user_type`: Filter by type ('user' or 'creator')\n\n**Response:**\n- Returns paginated list of users\n- Includes pagination metadata\n- Shows all user details including inactive accounts"
+					}
+				},
+				{
+					"name": "Get All Media (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/media?page=1&page_size=20&media_type=image&user_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"media"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								},
+								{
+									"key": "media_type",
+									"value": "image"
+								},
+								{
+									"key": "user_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get paginated list of all media files (Admin only).\n\n**Authentication:** Required (Admin JWT token)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 10, max: 100)\n- `media_type`: Filter by type ('image' or 'video')\n- `user_id`: Filter by specific user ID\n\n**Response:**\n- Returns paginated list of media files\n- Includes pagination metadata\n- Shows media from all users"
+					}
+				}
+			]
+		},
+		{
+			"name": "Industries",
+			"item": [
+				{
+					"name": "Get All Industries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/industries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"industries"
+							]
+						},
+						"description": "Get list of all available industries/sectors.\n\n**Authentication:** Not required (Public endpoint)\n\n**Response:**\n- Returns complete list of industries\n- Includes industry ID, name, and slug\n- Sorted alphabetically by name\n\n**Use Cases:**\n- Populate industry dropdown in registration forms\n- Display available sectors for creator users\n- Filter content by industry"
+					}
+				},
+				{
+					"name": "Get Industry by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/industries/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"industries",
+								"1"
+							]
+						},
+						"description": "Get specific industry by its ID.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `id`: Industry ID (integer)\n\n**Response:**\n- Returns industry details if found\n- Returns 404 if industry doesn't exist\n\n**Use Cases:**\n- Get industry details for display\n- Validate industry selection\n- Show industry information"
+					}
+				},
+				{
+					"name": "Get Industry by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/industries/slug/technology",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"industries",
+								"slug",
+								"technology"
+							]
+						},
+						"description": "Get specific industry by its slug.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `slug`: Industry slug (string, URL-friendly)\n\n**Response:**\n- Returns industry details if found\n- Returns 404 if industry doesn't exist\n\n**Use Cases:**\n- SEO-friendly URLs\n- Filter by industry in URLs\n- Industry-based routing\n\n**Example Slugs:**\n- `technology`\n- `healthcare`\n- `finance`\n- `food-beverage`\n- `real-estate`"
+					}
+				}
+			]
+		},
+		{
+			"name": "Creator Management",
+			"item": [
+				{
+					"name": "Create Creator Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weeztix_token\": \"{\\\"api_key\\\": \\\"your_api_key\\\", \\\"secret\\\": \\\"your_secret\\\"}\",\n  \"company_name\": \"Tech Events Corp\",\n  \"address\": \"İstanbul, Türkiye\",\n  \"estimated_tickets\": 1000,\n  \"estimated_events\": 12,\n  \"industry_ids\": [1, 3, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators"
+							]
+						},
+						"description": "Create a new creator profile for authenticated creator user.\n\n**Authentication:** Required (Creator type user JWT token)\n\n**Required Fields:**\n- `company_name`: Company name (2-200 characters)\n- `address`: Business address (5-500 characters)\n- `estimated_tickets`: Estimated ticket sales per year (minimum 1)\n- `estimated_events`: Estimated events per year (minimum 1)\n- `industry_ids`: Array of industry IDs (at least 1 industry)\n\n**Optional Fields:**\n- `weeztix_token`: Weeztix integration token in JSON format\n\n**Response:**\n- Returns created creator profile with industry details\n- Includes creator ID for future operations"
+					}
+				},
+				{
+					"name": "Get Creator List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators?page=1&page_size=10&industry_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								},
+								{
+									"key": "industry_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get paginated list of creators with optional industry filter.\n\n**Authentication:** Not required (Public endpoint)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 20, max: 100)\n- `industry_id`: Filter by specific industry ID\n\n**Response:**\n- Returns paginated list of creators\n- Includes industry associations for each creator\n- Shows pagination metadata (total, pages, etc.)\n\n**Use Cases:**\n- Browse available event creators\n- Filter creators by industry\n- Display creator directory"
+					}
+				},
+				{
+					"name": "Get Creator by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators",
+								"1"
+							]
+						},
+						"description": "Get specific creator details by creator ID.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `id`: Creator ID (integer)\n\n**Response:**\n- Returns creator profile details\n- Includes associated industries\n- Shows company information and estimates\n- Weeztix token is hidden for security\n\n**Use Cases:**\n- Display creator profile page\n- Show creator details in event listings\n- Validate creator existence"
+					}
+				},
+				{
+					"name": "Get My Creator Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators",
+								"me"
+							]
+						},
+						"description": "Get complete creator profile for authenticated user.\n\n**Authentication:** Required (Creator user JWT token)\n\n**Response:**\n- Returns both user and creator profile data\n- Includes sensitive information like Weeztix token\n- Shows complete industry associations\n- Includes user profile details (name, email, etc.)\n\n**Use Cases:**\n- Display creator dashboard\n- Show profile management interface\n- Pre-fill profile edit forms"
+					}
+				},
+				{
+					"name": "Update Creator Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"company_name\": \"Updated Tech Events Corp\",\n  \"address\": \"Ankara, Türkiye\",\n  \"estimated_tickets\": 1500,\n  \"estimated_events\": 15,\n  \"industry_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators",
+								"me"
+							]
+						},
+						"description": "Update creator profile information.\n\n**Authentication:** Required (Creator user JWT token)\n\n**Optional Fields:**\n- `company_name`: Updated company name (2-200 characters)\n- `address`: Updated business address (5-500 characters)\n- `estimated_tickets`: Updated ticket estimate (minimum 1)\n- `estimated_events`: Updated event estimate (minimum 1)\n- `industry_ids`: Updated industry associations (at least 1)\n\n**Behavior:**\n- Updates only provided fields\n- Validates industry IDs exist\n- Replaces industry associations completely\n- Maintains existing Weeztix token"
+					}
+				},
+				{
+					"name": "Set Weeztix Token",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weeztix_token\": \"{\\\"api_key\\\": \\\"new_api_key\\\", \\\"secret\\\": \\\"new_secret\\\", \\\"webhook_url\\\": \\\"https://example.com/webhook\\\"}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators/me/weeztix-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators",
+								"me",
+								"weeztix-token"
+							]
+						},
+						"description": "Set or update Weeztix integration token.\n\n**Authentication:** Required (Creator user JWT token)\n\n**Required Fields:**\n- `weeztix_token`: Weeztix integration token in JSON string format (10-255 characters)\n\n**Token Format:**\n- Must be valid JSON string\n- Typically contains API credentials\n- Example: `{\"api_key\": \"key\", \"secret\": \"secret\", \"webhook_url\": \"url\"}`\n\n**Use Cases:**\n- Initial Weeztix integration setup\n- Update expired API credentials\n- Configure webhook endpoints"
+					}
+				},
+				{
+					"name": "Delete Creator Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/creators/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"creators",
+								"me"
+							]
+						},
+						"description": "Delete creator profile for authenticated user.\n\n**Authentication:** Required (Creator user JWT token)\n\n**Behavior:**\n- Removes creator profile completely\n- Deletes all creator-industry associations\n- User account remains active as regular user\n- Cannot be undone - profile must be recreated\n\n**Note:**\n- User type remains 'creator' but no creator profile exists\n- User can create new creator profile later\n- All creator-specific data is permanently deleted"
+					}
+				},
+				{
+					"name": "Creator Registration Step 4 (Example)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"creator@example.com\",\n  \"phone\": \"+905551234567\",\n  \"biography\": \"Professional event organizer with 10+ years experience\",\n  \"birth_date\": \"1985-01-01T00:00:00Z\",\n  \"company_name\": \"Tech Events Corp\",\n  \"address\": \"İstanbul, Türkiye\",\n  \"estimated_tickets\": 1000,\n  \"estimated_events\": 12,\n  \"industry_ids\": [1, 3, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/register/step4",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"register",
+								"step4"
+							]
+						},
+						"description": "Complete creator registration with profile details (Step 4).\n\n**Authentication:** Required (JWT token from registration step 1)\n\n**Required Fields (All Users):**\n- `full_name`: User's full name (2-100 characters)\n\n**Required Fields (Creator Users Only):**\n- `company_name`: Company name (2-200 characters)\n- `address`: Business address (5-500 characters)\n- `estimated_tickets`: Estimated ticket sales per year (minimum 1)\n- `estimated_events`: Estimated events per year (minimum 1)\n- `industry_ids`: Array of industry IDs (at least 1)\n\n**Optional Fields:**\n- `email`: Valid email address\n- `phone`: E.164 format phone number\n- `biography`: User biography (max 500 characters)\n- `birth_date`: Birth date in ISO format\n\n**Behavior:**\n- Updates user profile with provided information\n- For creator users: automatically creates creator profile\n- Validates all creator-specific requirements\n- Associates creator with selected industries"
+					}
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get Category Tree",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/tree",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"tree"
+							]
+						},
+						"description": "Get complete nested category tree structure.\n\n**Authentication:** Not required (Public endpoint)\n\n**Response:**\n- Returns hierarchical category tree with unlimited depth\n- Each category includes: id, name, slug, type, icon, depth, children\n- Cached for 10 minutes for optimal performance\n- Includes media details for category icons\n\n**Use Cases:**\n- Display category navigation menu\n- Show complete category hierarchy\n- Build category selection trees"
+					}
+				},
+				{
+					"name": "Get Category Tree by Type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/tree/type/concerts_&_festivals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"tree",
+								"type",
+								"concerts_&_festivals"
+							]
+						},
+						"description": "Get nested category tree filtered by specific category type.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `type`: Category type (concerts_&_festivals, party, culture, shows, sports, freetime_activities, business, ethnic, other)\n\n**Response:**\n- Returns hierarchical tree for specified category type only\n- Includes all subcategories under the main type\n- Same structure as complete tree but filtered\n\n**Use Cases:**\n- Show categories for specific event types\n- Filter category selection by context\n- Display type-specific navigation"
+					}
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"1"
+							]
+						},
+						"description": "Get specific category details by ID.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `id`: Category ID (integer)\n\n**Response:**\n- Returns category details with icon media information\n- Includes: id, name, slug, type, parent_id, depth, lft, rgt\n- Shows icon media details if available\n\n**Use Cases:**\n- Get category details for display\n- Validate category selection\n- Show category information in forms"
+					}
+				},
+				{
+					"name": "Get Category by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/slug/rock-music",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"slug",
+								"rock-music"
+							]
+						},
+						"description": "Get specific category details by slug.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `slug`: Category slug (URL-friendly string)\n\n**Response:**\n- Returns category details with icon media information\n- Same structure as get by ID\n\n**Use Cases:**\n- SEO-friendly category URLs\n- Category-based routing\n- URL parameter handling\n\n**Example Slugs:**\n- `rock-music`\n- `electronic-music`\n- `food-festivals`\n- `art-exhibitions`"
+					}
+				},
+				{
+					"name": "Get Category Children",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1/children",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"1",
+								"children"
+							]
+						},
+						"description": "Get direct children of a specific category.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `id`: Parent category ID\n\n**Response:**\n- Returns array of direct child categories only\n- Does not include nested subcategories\n- Each child includes full category details\n\n**Use Cases:**\n- Build expandable category menus\n- Show next level categories\n- Progressive category loading"
+					}
+				},
+				{
+					"name": "Get Category Parents",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/5/parents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"5",
+								"parents"
+							]
+						},
+						"description": "Get all parent categories (ancestors) of a specific category.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `id`: Category ID\n\n**Response:**\n- Returns array of all ancestor categories\n- Ordered from root to immediate parent\n- Useful for breadcrumb navigation\n\n**Use Cases:**\n- Build breadcrumb navigation\n- Show category hierarchy path\n- Category context display"
+					}
+				},
+				{
+					"name": "Get Root Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/roots",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"roots"
+							]
+						},
+						"description": "Get all root level categories (categories without parent).\n\n**Authentication:** Not required (Public endpoint)\n\n**Response:**\n- Returns array of top-level categories\n- These are the main category types\n- Each includes full category details with icons\n\n**Use Cases:**\n- Display main category navigation\n- Show primary category options\n- Build top-level category menus\n\n**Expected Root Categories:**\n- Concerts & Festivals\n- Party\n- Culture\n- Shows\n- Sports\n- Freetime Activities\n- Business\n- Ethnic\n- Other"
+					}
+				},
+				{
+					"name": "Get Leaf Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/leaves",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"leaves"
+							]
+						},
+						"description": "Get all leaf categories (categories without children).\n\n**Authentication:** Not required (Public endpoint)\n\n**Response:**\n- Returns array of end-level categories\n- These are the most specific categories\n- Useful for final category selection\n\n**Use Cases:**\n- Show final selectable categories\n- Event category assignment\n- Most specific category filtering"
+					}
+				},
+				{
+					"name": "Get Categories by Type (Flat)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/type/concerts_&_festivals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"type",
+								"concerts_&_festivals"
+							]
+						},
+						"description": "Get all categories of a specific type as flat list.\n\n**Authentication:** Not required (Public endpoint)\n\n**Path Parameters:**\n- `type`: Category type (concerts_&_festivals, party, culture, shows, sports, freetime_activities, business, ethnic, other)\n\n**Response:**\n- Returns flat array of all categories under specified type\n- Includes all levels (root, intermediate, leaf)\n- No hierarchical structure, just plain list\n\n**Use Cases:**\n- Simple category selection dropdowns\n- Search and filter operations\n- Category validation lists"
+					}
+				},
+				{
+					"name": "Search Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/search?q=music&type=concerts_&_festivals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "music"
+								},
+								{
+									"key": "type",
+									"value": "concerts_&_festivals"
+								}
+							]
+						},
+						"description": "Search categories by name or slug with optional type filter.\n\n**Authentication:** Not required (Public endpoint)\n\n**Query Parameters:**\n- `q`: Search query (minimum 2 characters, searches in name and slug)\n- `type`: Optional category type filter\n\n**Response:**\n- Returns array of matching categories\n- Searches both name and slug fields\n- Results include full category details\n\n**Use Cases:**\n- Category search functionality\n- Auto-complete category selection\n- Dynamic category filtering\n\n**Search Examples:**\n- `q=music` - finds all music-related categories\n- `q=rock&type=concerts_&_festivals` - finds rock categories in concerts\n- `q=food` - finds food-related categories across all types"
+					}
+				},
+				{
+					"name": "Refresh Category Cache (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/categories/cache/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"categories",
+								"cache",
+								"refresh"
+							]
+						},
+						"description": "Refresh the Redis cache for category tree (Admin only).\n\n**Authentication:** Required (Admin JWT token - creator user type)\n\n**Behavior:**\n- Clears existing category cache\n- Rebuilds cache with fresh data from database\n- Updates the 10-minute cache timer\n\n**Use Cases:**\n- Force cache update after data changes\n- Troubleshoot cache-related issues\n- Ensure fresh data delivery\n\n**Note:** Cache is automatically refreshed every 10 minutes, this endpoint allows manual refresh."
+					}
+				},
+				{
+					"name": "Clear Category Cache (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/categories/cache/clear",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"categories",
+								"cache",
+								"clear"
+							]
+						},
+						"description": "Clear the Redis cache for category tree (Admin only).\n\n**Authentication:** Required (Admin JWT token - creator user type)\n\n**Behavior:**\n- Removes category cache from Redis\n- Next category request will rebuild cache\n- Useful for cache troubleshooting\n\n**Use Cases:**\n- Clear corrupted cache data\n- Force fresh data loading\n- Cache maintenance operations\n\n**Note:** After clearing, the first category request will be slower as it rebuilds the cache."
+					}
+				}
+			]
+		},
+		{
+			"name": "Follow System",
+			"item": [
+				{
+					"name": "Follow User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows"
+							]
+						},
+						"description": "Follow another user (Instagram-like one-way follow system).\n\n**Authentication:** Required (JWT token)\n\n**Required Fields:**\n- `user_id`: ID of the user to follow\n\n**Behavior:**\n- Creates follow relationship between current user and target user\n- Prevents self-following\n- Prevents duplicate follows\n- Updates follower/following counts automatically\n- One-way relationship (doesn't require mutual following)\n\n**Response:**\n- Returns follow relationship details\n- Includes follower_id, following_id, and created_at timestamp\n\n**Use Cases:**\n- Follow interesting users\n- Build social connections\n- Create user networks"
+					}
+				},
+				{
+					"name": "Unfollow User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows",
+								"2"
+							]
+						},
+						"description": "Unfollow a user you're currently following.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `user_id`: ID of the user to unfollow\n\n**Behavior:**\n- Removes follow relationship if it exists\n- Updates follower/following counts automatically\n- Returns success even if relationship didn't exist\n- Only affects your following, not mutual relationships\n\n**Response:**\n- Returns success message on completion\n\n**Use Cases:**\n- Unfollow users you're no longer interested in\n- Manage your following list\n- Clean up social connections"
+					}
+				},
+				{
+					"name": "Check Follow Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows/status/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows",
+								"status",
+								"2"
+							]
+						},
+						"description": "Check follow relationship status between you and another user.\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `user_id`: ID of the user to check relationship with\n\n**Response:**\n- `user_id`: The target user's ID\n- `is_following`: Whether you follow this user\n- `is_followed_by`: Whether this user follows you\n\n**Use Cases:**\n- Display follow/unfollow button states\n- Show mutual follow indicators\n- Determine relationship status for UI\n\n**Example Response:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"user_id\": 2,\n    \"is_following\": true,\n    \"is_followed_by\": false\n  }\n}\n```"
+					}
+				},
+				{
+					"name": "Get My Followers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows/followers?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows",
+								"followers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get paginated list of users who follow you.\n\n**Authentication:** Required (JWT token)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 20, max: 100)\n\n**Response:**\n- Returns paginated list of followers\n- Each follower includes user details and follow timestamp\n- Includes profile pictures and basic user info\n- Shows pagination metadata (total, pages, etc.)\n\n**Use Cases:**\n- Display followers list in profile\n- Show who's following you\n- Follower management interface\n\n**Response Format:**\n- `followers`: Array of follower objects with user details\n- `total`: Total number of followers\n- `page`, `page_size`, `total_pages`: Pagination info"
+					}
+				},
+				{
+					"name": "Get My Following",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows/following?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows",
+								"following"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get paginated list of users you're following.\n\n**Authentication:** Required (JWT token)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 20, max: 100)\n\n**Response:**\n- Returns paginated list of users you follow\n- Each following includes user details and follow timestamp\n- Includes profile pictures and basic user info\n- Shows pagination metadata (total, pages, etc.)\n\n**Use Cases:**\n- Display following list in profile\n- Show who you're following\n- Following management interface\n- Unfollow functionality\n\n**Response Format:**\n- `following`: Array of following objects with user details\n- `total`: Total number of users you're following\n- `page`, `page_size`, `total_pages`: Pagination info"
+					}
+				},
+				{
+					"name": "Get Mutual Follows",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/follows/mutual/2?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"follows",
+								"mutual",
+								"2"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get users who both you and another user follow (mutual connections).\n\n**Authentication:** Required (JWT token)\n\n**Path Parameters:**\n- `user_id`: ID of the user to find mutual follows with\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `page_size`: Items per page (default: 20, max: 100)\n\n**Response:**\n- Returns paginated list of mutual follows\n- Shows users that both you and the target user follow\n- Includes user details and profile pictures\n- Shows pagination metadata\n\n**Use Cases:**\n- Show mutual connections between users\n- Discover common interests through mutual follows\n- Social network analysis\n- Friend suggestions based on mutual connections\n\n**Response Format:**\n- `mutual_follows`: Array of user objects you both follow\n- `total`: Total number of mutual follows\n- `page`, `page_size`, `total_pages`: Pagination info"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

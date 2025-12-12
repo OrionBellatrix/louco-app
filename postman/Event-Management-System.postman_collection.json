@@ -1,0 +1,957 @@
+{
+	"info": {
+		"_postman_id": "event-mgmt-1234-5678-9012-123456789012",
+		"name": "Event Management System API",
+		"description": "Complete Event Management System API collection for Louco Event backend.\n\n## Base URL\n- Development: http://localhost:8080\n\n## Authentication\nAll endpoints require JWT token in Authorization header:\n```\nAuthorization: Bearer <your_jwt_token>\n```\n\n## Language Support\nAPI supports Turkish and English. Set Accept-Language header:\n- `tr` for Turkish\n- `en` for English (default)\n\n## Updated Route Structure\n- Address Management: `/api/v1/addresses`\n- Event Management: `/api/v1/events/manage`\n- Ticket Management: `/api/v1/tickets/event/:event_id`\n- Invitation Management: `/api/v1/invitations/event/:event_id`\n- Public Events: `/api/v1/events`\n\n## Event + Address Workflow\n1. Create Address: POST `/api/v1/addresses`\n2. Create Event with address_id: POST `/api/v1/events/manage`\n\n## Response Format\nAll responses follow this standard format:\n```json\n{\n  \"success\": true,\n  \"message\": \"i18n.key\",\n  \"data\": {},\n  \"errors\": null\n}\n```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Address Management",
+			"item": [
+				{
+					"name": "Create Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"place_id\": \"ChIJVTPokywsQkARmtVhquZmAQM\",\n  \"full_address\": \"Istanbul Convention Center, Harbiye Mahallesi, Şişli/Istanbul, Turkey\",\n  \"country\": \"Turkey\",\n  \"city\": \"Istanbul\",\n  \"district\": \"Şişli\",\n  \"street\": \"Harbiye Mahallesi\",\n  \"postal_code\": \"34367\",\n  \"latitude\": 41.0082,\n  \"longitude\": 28.9784,\n  \"door_number\": \"1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/addresses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses"
+							]
+						},
+						"description": "Create a new address with Google Places API integration (Creator users only)."
+					}
+				},
+				{
+					"name": "Get Address by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/addresses/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"1"
+							]
+						},
+						"description": "Get detailed information about a specific address."
+					}
+				},
+				{
+					"name": "Search Addresses with Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/addresses/search?country=Turkey&city=Istanbul&page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "Turkey"
+								},
+								{
+									"key": "city",
+									"value": "Istanbul"
+								},
+								{
+									"key": "district",
+									"value": "Şişli",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Search addresses with multiple filter options (country, city, district, etc.)."
+					}
+				},
+				{
+					"name": "Get Addresses by City",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/addresses/city/Istanbul?page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"city",
+								"Istanbul"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get paginated list of addresses in a specific city."
+					}
+				}
+			]
+		},
+		{
+			"name": "Event Management",
+			"item": [
+				{
+					"name": "Create Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Tech Conference 2025\",\n  \"description\": \"Annual technology conference with industry leaders and innovative presentations.\",\n  \"type\": \"public\",\n  \"location_type\": \"location\",\n  \"start_date\": \"2025-03-15\",\n  \"start_time\": \"09:00\",\n  \"end_date\": \"2025-03-15\",\n  \"end_time\": \"18:00\",\n  \"address_id\": 1,\n  \"category_ids\": [1, 5, 8],\n  \"image_id\": 10,\n  \"video_id\": 15\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage"
+							]
+						},
+						"description": "Create a new event (Creator users only)."
+					}
+				},
+				{
+					"name": "Get Event Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1"
+							]
+						},
+						"description": "Get detailed information about a specific event."
+					}
+				},
+				{
+					"name": "Update Event",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Tech Conference 2025\",\n  \"description\": \"Updated description with more details.\",\n  \"start_date\": \"2025-03-20\",\n  \"start_time\": \"10:00\",\n  \"category_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1"
+							]
+						},
+						"description": "Update event information (Event owner only)."
+					}
+				},
+				{
+					"name": "Delete Event",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1"
+							]
+						},
+						"description": "Delete an event (Event owner only)."
+					}
+				},
+				{
+					"name": "Get My Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/my?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"my"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get paginated list of my events."
+					}
+				},
+				{
+					"name": "Get My Draft Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/my/drafts?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"my",
+								"drafts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get paginated list of my draft events."
+					}
+				},
+				{
+					"name": "Get My Published Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/my/published?page=1&page_size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"my",
+								"published"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get paginated list of my published events."
+					}
+				},
+				{
+					"name": "Submit Event for Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1",
+								"submit"
+							]
+						},
+						"description": "Submit event for review (draft → pending)."
+					}
+				},
+				{
+					"name": "Publish Event (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1/publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1",
+								"publish"
+							]
+						},
+						"description": "Publish an event (Admin only - pending → published)."
+					}
+				},
+				{
+					"name": "Cancel Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/1/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"1",
+								"cancel"
+							]
+						},
+						"description": "Cancel a published event (Event owner only)."
+					}
+				},
+				{
+					"name": "Get Event Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/manage/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"manage",
+								"stats"
+							]
+						},
+						"description": "Get comprehensive statistics for my events."
+					}
+				}
+			]
+		},
+		{
+			"name": "Public Event Discovery",
+			"item": [
+				{
+					"name": "Get Public Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events?page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get paginated list of public events."
+					}
+				},
+				{
+					"name": "Search Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/search?q=tech conference&page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "tech conference"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Search events by name and description."
+					}
+				},
+				{
+					"name": "Get Events by Location",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/location/Istanbul?page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"location",
+								"Istanbul"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get events in a specific city."
+					}
+				},
+				{
+					"name": "Get Upcoming Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/upcoming?page=1&page_size=20&days=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"upcoming"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								},
+								{
+									"key": "days",
+									"value": "30"
+								}
+							]
+						},
+						"description": "Get upcoming events within specified time range."
+					}
+				},
+				{
+					"name": "Get Events by Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/category/1?page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"category",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get events in a specific category."
+					}
+				}
+			]
+		},
+		{
+			"name": "Ticket Management",
+			"item": [
+				{
+					"name": "Create Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Early Bird Ticket\",\n  \"price\": 150.00,\n  \"total_quantity\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/tickets/event/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tickets",
+								"event",
+								"1"
+							]
+						},
+						"description": "Create a new ticket type for an event."
+					}
+				},
+				{
+					"name": "Get Event Tickets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tickets/event/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tickets",
+								"event",
+								"1"
+							]
+						},
+						"description": "Get all tickets for a specific event."
+					}
+				}
+			]
+		},
+		{
+			"name": "Invitation Management",
+			"item": [
+				{
+					"name": "Send Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"invited_user_id\": 10,\n  \"invited_email\": \"guest@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/invitations/event/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"invitations",
+								"event",
+								"1"
+							]
+						},
+						"description": "Send invitation for an event."
+					}
+				},
+				{
+					"name": "Get Event Invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/invitations/event/1?page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"invitations",
+								"event",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get paginated list of invitations for an event."
+					}
+				},
+				{
+					"name": "Respond to Invitation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "tr"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"response\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/invitations/1/respond",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"invitations",
+								"1",
+								"respond"
+							]
+						},
+						"description": "Respond to an event invitation (accept/decline)."
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

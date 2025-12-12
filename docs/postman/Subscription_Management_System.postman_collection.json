@@ -1,0 +1,892 @@
+{
+	"info": {
+		"_postman_id": "subscription-mgmt-2024",
+		"name": "Subscription & Package Management System",
+		"description": "Complete Subscription and Package Management System with Stripe integration, event publishing rights validation, and usage tracking.\n\n## Features\n- Subscription Plans (Basic, Plus, Pro) with weekly/monthly limits\n- One-time Packages (1, 10, 25 events) with credit system\n- Stripe payment processing\n- Event publishing rights validation\n- Usage tracking and consumption\n- Webhook handling for payment events\n\n## Authentication\nAll endpoints require Bearer token authentication except webhook endpoints.\n\n## Base URL\n{{base_url}}/api/v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Subscription Plans",
+			"item": [
+				{
+					"name": "Get All Subscription Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/plans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"plans"
+							]
+						},
+						"description": "Retrieve all available subscription plans with pricing and limits."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subscription Plan by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/plans/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"plans",
+								"1"
+							]
+						},
+						"description": "Get details of a specific subscription plan by ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing subscription plans (readonly for users)."
+		},
+		{
+			"name": "User Subscriptions",
+			"item": [
+				{
+					"name": "Get My Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/my",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"my"
+							]
+						},
+						"description": "Get current user's active subscriptions and packages."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Publishing Rights",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/publishing-rights",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"publishing-rights"
+							]
+						},
+						"description": "Check current user's event publishing rights and remaining limits/credits."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Usage Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/usage-stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"usage-stats"
+							]
+						},
+						"description": "Get detailed usage statistics for current user's subscriptions and packages."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing user subscriptions and checking usage."
+		},
+		{
+			"name": "Subscription Purchase",
+			"item": [
+				{
+					"name": "Purchase Subscription Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": 1,\n  \"billing_cycle\": \"monthly\",\n  \"payment_method_id\": \"pm_card_visa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/purchase",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"purchase"
+							]
+						},
+						"description": "Purchase a subscription plan with Stripe payment processing.\n\n**Request Body:**\n- `plan_id`: ID of the subscription plan (1=Basic, 2=Plus, 3=Pro)\n- `billing_cycle`: \"weekly\" or \"monthly\"\n- `payment_method_id`: Stripe payment method ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Package",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": 4,\n  \"payment_method_id\": \"pm_card_visa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/purchase-package",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"purchase-package"
+							]
+						},
+						"description": "Purchase a one-time event package with Stripe payment processing.\n\n**Request Body:**\n- `plan_id`: ID of the package plan (4=1 Event, 5=10 Events, 6=25 Events)\n- `payment_method_id`: Stripe payment method ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for purchasing subscriptions and packages."
+		},
+		{
+			"name": "Subscription Management",
+			"item": [
+				{
+					"name": "Cancel Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subscription_id\": 1,\n  \"reason\": \"No longer needed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"cancel"
+							]
+						},
+						"description": "Cancel an active subscription.\n\n**Request Body:**\n- `subscription_id`: ID of the subscription to cancel\n- `reason`: Optional cancellation reason"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Subscription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subscription_id\": 1,\n  \"new_plan_id\": 2,\n  \"billing_cycle\": \"monthly\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"update"
+							]
+						},
+						"description": "Update an existing subscription (upgrade/downgrade).\n\n**Request Body:**\n- `subscription_id`: ID of the subscription to update\n- `new_plan_id`: New subscription plan ID\n- `billing_cycle`: New billing cycle (optional)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing existing subscriptions."
+		},
+		{
+			"name": "Event Publishing Integration",
+			"item": [
+				{
+					"name": "Submit Event for Review (With Rights Check)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/events/{{event_id}}/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"{{event_id}}",
+								"submit"
+							]
+						},
+						"description": "Submit an event for review. This endpoint now includes subscription/package rights validation.\n\n**Publishing Rights Validation:**\n- Checks if user has active subscription or package\n- Validates remaining limits/credits\n- Consumes usage after successful submission\n- Returns detailed error messages for insufficient rights\n\n**Error Scenarios:**\n- No active subscription/package\n- Weekly/monthly limit exceeded\n- Package credits exhausted\n- Expired subscription"
+					},
+					"response": []
+				},
+				{
+					"name": "Test Publishing Rights (Without Submission)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{language}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subscriptions/can-publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"can-publish"
+							]
+						},
+						"description": "Check if current user can publish events without actually submitting an event."
+					},
+					"response": []
+				}
+			],
+			"description": "Integration with Event Management System for publishing rights validation."
+		},
+		{
+			"name": "Stripe Webhooks",
+			"item": [
+				{
+					"name": "Stripe Webhook Handler",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Stripe-Signature",
+								"value": "{{stripe_signature}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"evt_test_webhook\",\n  \"object\": \"event\",\n  \"api_version\": \"2020-08-27\",\n  \"created\": 1326853478,\n  \"data\": {\n    \"object\": {\n      \"id\": \"sub_test_subscription\",\n      \"object\": \"subscription\",\n      \"status\": \"active\"\n    }\n  },\n  \"livemode\": false,\n  \"pending_webhooks\": 1,\n  \"request\": {\n    \"id\": \"req_test_request\",\n    \"idempotency_key\": null\n  },\n  \"type\": \"customer.subscription.created\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/webhooks/stripe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"stripe"
+							]
+						},
+						"description": "Stripe webhook endpoint for handling payment events.\n\n**Supported Events:**\n- `customer.subscription.created`\n- `customer.subscription.updated`\n- `customer.subscription.deleted`\n- `invoice.payment_succeeded`\n- `invoice.payment_failed`\n- `payment_intent.succeeded`\n- `payment_intent.payment_failed`\n\n**Note:** This endpoint doesn't require authentication but validates Stripe signature."
+					},
+					"response": []
+				}
+			],
+			"description": "Webhook endpoints for Stripe payment processing."
+		},
+		{
+			"name": "Test Scenarios",
+			"item": [
+				{
+					"name": "Scenario 1: Purchase Basic Subscription",
+					"item": [
+						{
+							"name": "1. Check Available Plans",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/plans",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"plans"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Purchase Basic Monthly",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"plan_id\": 1,\n  \"billing_cycle\": \"monthly\",\n  \"payment_method_id\": \"pm_card_visa\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/purchase",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"purchase"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Check My Subscriptions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/my",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"my"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "4. Check Publishing Rights",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/publishing-rights",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"publishing-rights"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Complete workflow for purchasing and using a Basic subscription."
+				},
+				{
+					"name": "Scenario 2: Purchase Event Package",
+					"item": [
+						{
+							"name": "1. Purchase 10 Events Package",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"plan_id\": 5,\n  \"payment_method_id\": \"pm_card_visa\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/purchase-package",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"purchase-package"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Check Usage Stats",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/usage-stats",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"usage-stats"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Complete workflow for purchasing and using event packages."
+				},
+				{
+					"name": "Scenario 3: Test Publishing Rights Validation",
+					"item": [
+						{
+							"name": "1. Try Publishing Without Subscription",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/events/{{event_id}}/submit",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"events",
+										"{{event_id}}",
+										"submit"
+									]
+								},
+								"description": "This should fail with 'insufficient publishing rights' error."
+							},
+							"response": []
+						},
+						{
+							"name": "2. Purchase Package",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"plan_id\": 4,\n  \"payment_method_id\": \"pm_card_visa\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/purchase-package",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"purchase-package"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Try Publishing With Package",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/events/{{event_id}}/submit",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"events",
+										"{{event_id}}",
+										"submit"
+									]
+								},
+								"description": "This should succeed and consume 1 credit from the package."
+							},
+							"response": []
+						},
+						{
+							"name": "4. Check Remaining Credits",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/subscriptions/usage-stats",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"subscriptions",
+										"usage-stats"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Test the complete publishing rights validation workflow."
+				}
+			],
+			"description": "Complete test scenarios for subscription and package workflows."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-set common variables",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://localhost:8080');",
+					"}",
+					"if (!pm.environment.get('language')) {",
+					"    pm.environment.set('language', 'en');",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-extract common response data",
+					"if (pm.response.code === 200 || pm.response.code === 201) {",
+					"    try {",
+					"        const response = pm.response.json();",
+					"        ",
+					"        // Extract subscription ID from purchase responses",
+					"        if (response.data && response.data.id && pm.request.url.path.includes('purchase')) {",
+					"            pm.environment.set('subscription_id', response.data.id);",
+					"        }",
+					"        ",
+					"        // Extract event ID from event creation",
+					"        if (response.data && response.data.id && pm.request.url.path.includes('events')) {",
+					"            pm.environment.set('event_id', response.data.id);",
+					"        }",
+					"    } catch (e) {",
+					"        console.log('Could not parse response JSON');",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "language",
+			"value": "en",
+			"type": "string"
+		}
+	]
+}
