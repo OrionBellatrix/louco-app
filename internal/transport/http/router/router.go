@@ -68,6 +68,12 @@ func SetupRoutes(r *gin.Engine, deps *factory.Dependencies) {
 			subscriptions.GET("/plans/packages", subscriptionHandler.GetPackagePlans)
 		}
 
+		// Webhook routes (no authentication required)
+		webhooks := v1.Group("/webhooks")
+		{
+			webhooks.POST("/stripe", subscriptionHandler.StripeWebhook)
+		}
+
 		// Public creator routes (no authentication required)
 		creators := v1.Group("/creators")
 		{
@@ -206,9 +212,6 @@ func SetupRoutes(r *gin.Engine, deps *factory.Dependencies) {
 
 				// Subscription management
 				subscriptionProtected.POST("/:id/cancel", subscriptionHandler.CancelSubscription)
-
-				// Stripe webhook (no authentication required for webhooks)
-				subscriptionProtected.POST("/webhook/stripe", subscriptionHandler.StripeWebhook)
 			}
 		}
 

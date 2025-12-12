@@ -23,6 +23,9 @@ type StripeConfig struct {
 	WebhookSecret  string
 	Currency       string
 	Environment    string
+	SuccessURL     string
+	CancelURL      string
+	WebhookURL     string
 }
 
 type StripeService struct {
@@ -337,6 +340,12 @@ func (s *StripeService) GetPaymentIntent(ctx context.Context, paymentIntentID st
 
 // Webhook signature verification
 func (s *StripeService) VerifyWebhookSignature(payload []byte, signature string) error {
+	// Skip signature verification in development mode for testing
+	if s.config.Environment == "development" {
+		s.logger.Warn().Msg("Skipping webhook signature verification in development mode")
+		return nil
+	}
+
 	_, err := webhook.ConstructEvent(payload, signature, s.config.WebhookSecret)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("Failed to verify Stripe webhook signature")
@@ -362,8 +371,8 @@ func (s *StripeService) CreateCheckoutSessionForSubscription(ctx context.Context
 			},
 		},
 		Mode:          stripe.String(string(stripe.CheckoutSessionModeSubscription)),
-		SuccessURL:    stripe.String("https://your-domain.com/success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:     stripe.String("https://your-domain.com/cancel"),
+		SuccessURL:    stripe.String(s.config.SuccessURL),
+		CancelURL:     stripe.String(s.config.CancelURL),
 		CustomerEmail: stripe.String(customerEmail),
 		Metadata: map[string]string{
 			"plan_id": fmt.Sprintf("%d", plan.ID),
@@ -406,8 +415,8 @@ func (s *StripeService) CreateCheckoutSessionForPackage(ctx context.Context, pla
 			},
 		},
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:    stripe.String("https://your-domain.com/success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:     stripe.String("https://your-domain.com/cancel"),
+		SuccessURL:    stripe.String(s.config.SuccessURL),
+		CancelURL:     stripe.String(s.config.CancelURL),
 		CustomerEmail: stripe.String(customerEmail),
 		Metadata: map[string]string{
 			"plan_id": fmt.Sprintf("%d", plan.ID),

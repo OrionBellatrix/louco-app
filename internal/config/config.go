@@ -91,6 +91,9 @@ type StripeConfig struct {
 	WebhookSecret  string
 	Currency       string
 	Environment    string // "test" or "live"
+	SuccessURL     string
+	CancelURL      string
+	WebhookURL     string
 }
 
 func Load() (*Config, error) {
@@ -161,6 +164,9 @@ func Load() (*Config, error) {
 			WebhookSecret:  getEnv("STRIPE_WEBHOOK_SECRET", ""),
 			Currency:       getEnv("STRIPE_CURRENCY", "usd"),
 			Environment:    getEnv("STRIPE_ENVIRONMENT", "test"),
+			SuccessURL:     getEnv("STRIPE_SUCCESS_URL", "https://your-domain.com/payment/success"),
+			CancelURL:      getEnv("STRIPE_CANCEL_URL", "https://your-domain.com/payment/cancel"),
+			WebhookURL:     getEnv("STRIPE_WEBHOOK_URL", "https://your-domain.com/api/v1/webhooks/stripe"),
 		},
 	}
 

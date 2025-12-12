@@ -7,3 +7,18 @@ bin/
 *.dll
 *.so
 *.dylib
+
+# IDE and system files
+.cursor/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/

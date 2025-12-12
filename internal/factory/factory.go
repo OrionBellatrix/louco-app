@@ -164,6 +164,9 @@ func NewDependencies(cfg *config.Config, logger *logger.Logger) (*Dependencies, 
 		WebhookSecret:  cfg.Stripe.WebhookSecret,
 		Currency:       cfg.Stripe.Currency,
 		Environment:    cfg.Stripe.Environment,
+		SuccessURL:     cfg.Stripe.SuccessURL,
+		CancelURL:      cfg.Stripe.CancelURL,
+		WebhookURL:     cfg.Stripe.WebhookURL,
 	}
 	stripeService := stripe.NewStripeService(stripeConfig, logger)
 
